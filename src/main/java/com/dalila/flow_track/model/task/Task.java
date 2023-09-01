@@ -1,8 +1,10 @@
 package com.dalila.flow_track.model.task;
 
 import com.dalila.flow_track.model.user.User;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,13 +13,15 @@ import java.util.UUID;
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String title;
     private String description;
     private TaskStatus status;
     private String createdBy;
-    private List<User> assignedUsers;
+
+    @ManyToMany(mappedBy = "tasks", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    private List<User> assignedUsers = new ArrayList<>();
 
     public Task(){
     }
@@ -27,8 +31,16 @@ public class Task {
         this.title = title;
         this.description = description;
         this.status = status;
-        this.createdBy = createdBy;
         this.assignedUsers = assignedUsers;
+        this.createdBy = createdBy;
+    }
+
+    public Task(UUID id, String title, String description, TaskStatus status, String createdBy) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.createdBy = createdBy;
     }
 
     public UUID getId() {
