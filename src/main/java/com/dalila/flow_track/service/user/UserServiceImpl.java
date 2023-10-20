@@ -6,6 +6,9 @@ import com.dalila.flow_track.repository.UserRepository;
 import com.dalila.flow_track.service.task.TaskServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +17,7 @@ import java.util.UUID;
 
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -48,7 +51,7 @@ public class UserServiceImpl implements UserService {
     public User updateUser(User userUpdated) {
         Optional<User> idValidExists = userRepository.findById(userUpdated.getId());
         if(idValidExists.isEmpty()){
-            throw new RuntimeException("This User dont is register. Please create User first.");
+            throw new RuntimeException("This User don't is register.");
         }
         else {
             User user = idValidExists.get();
@@ -67,6 +70,15 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).get();
         taskService.deleteAllTasksForUser(user.getId());
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByLogin(username);
+    }
+
+    public UserDetails findByLogin(String login){
+        return userRepository.findByLogin(login);
     }
 }
 
